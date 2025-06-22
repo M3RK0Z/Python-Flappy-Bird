@@ -6,10 +6,10 @@ from bird import Bird
 from pipes import Pipes
 from utils import load_config, save_score, load_scores, get_player_scores
 
-
 class TestFlappyBird(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        """Inicjalizacja przed wszystkimi testami - mockowanie pygame"""
         # Kompleksowe mockowanie pygame
         cls.pygame_mock = MagicMock()
         cls.pygame_mock.display.set_mode.return_value = MagicMock()
@@ -43,16 +43,18 @@ class TestFlappyBird(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        """Sprzątanie po wszystkich testach"""
         # Przywracanie oryginalnej implementacji
         FlappyBirdGame.show_name_input = cls.original_show_name_input
         cls.patcher.stop()
 
     def setUp(self):
-        self.test_name = f"TEST_{self.id()}"
+        """Inicjalizacja przed każdym testem"""
+        self.test_name = f"TEST_{self.id()}"  # Unikalna nazwa testowa
         self.test_score = 10
 
     def tearDown(self):
-        # Automatyczne czyszczenie danych testowych
+        """Sprzątanie po każdym teście - usuwanie danych testowych"""
         scores = load_scores()
         if scores and 'players' in scores:
             scores['players'] = [p for p in scores['players'] if p['name'] != self.test_name]
@@ -60,6 +62,7 @@ class TestFlappyBird(unittest.TestCase):
                 json.dump(scores, f)
 
     def test_load_config(self):
+        """Test wczytywania konfiguracji"""
         config = load_config()
         self.assertIsInstance(config, dict)
         self.assertIn('width', config)
@@ -67,43 +70,49 @@ class TestFlappyBird(unittest.TestCase):
         self.assertIn('gravity', config)
 
     def test_save_and_load_scores(self):
+        """Test zapisywania i wczytywania wyników"""
         save_score(self.test_name, self.test_score)
         scores = load_scores()
         self.assertIn("players", scores)
         self.assertTrue(any(player["name"] == self.test_name for player in scores["players"]))
 
     def test_get_player_scores(self):
+        """Test pobierania wyników konkretnego gracza"""
         save_score(self.test_name, self.test_score)
         scores = get_player_scores(self.test_name)
         self.assertTrue(all(self.test_name.lower() in score["name"].lower() for score in scores))
 
     def test_bird_jump(self):
+        """Test działania skoku ptaka"""
         bird = Bird(100, 300, 30, 0.25, 7)
         bird.jump()
-        self.assertEqual(bird.movement, -7)
+        self.assertEqual(bird.movement, -7)  # Sprawdzenie czy ruch został ustawiony poprawnie
 
     def test_pipes_collision(self):
+        """Test wykrywania kolizji z rurami"""
         pipes = Pipes(60, 150, 3)
         bird = Bird(100, 300, 30, 0.25, 7)
         pipes.add_pipe(600)
+        # Symulacja kolizji
         bird.rect.x = pipes.pipes[0].x
         bird.rect.y = pipes.pipes[0].y
         self.assertTrue(pipes.check_collision(bird.rect))
 
     @patch('pygame.mixer.Sound')
     def test_bird_jump_sound(self, mock_sound):
+        """Test odtwarzania dźwięku skoku"""
         bird = Bird(100, 300, 30, 0.25, 7)
         bird.jump()
         if bird.jump_sound:
-            bird.jump_sound.play.assert_called_once()
+            bird.jump_sound.play.assert_called_once()  # Sprawdzenie czy dźwięk został odtworzony
 
     def test_game_reset(self):
+        """Test resetowania gry"""
         self.game.start_game()
-        self.game.bird.rect.y = 0
+        self.game.bird.rect.y = 0  # Symulacja uderzenia w sufit
         self.game.update()
-        self.assertFalse(self.game.game_active)
-        self.assertTrue(self.game.menu_active)
-
+        self.assertFalse(self.game.game_active)  # Czy gra została zatrzymana
+        self.assertTrue(self.game.menu_active)    # Czy menu zostało aktywowane
 
 if __name__ == '__main__':
     unittest.main()

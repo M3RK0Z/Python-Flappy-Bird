@@ -4,25 +4,33 @@ from bird import Bird
 from pipes import Pipes
 from utils import load_config, save_score, load_scores, get_player_scores
 
+
 class FlappyBirdGame:
     def __init__(self):
+        # Kolory używane w grze
         self.orange_color = (255, 165, 0)
         self.dark_orange = (200, 120, 0)
         self.white = (255, 255, 255)
         self.black = (0, 0, 0)
 
+        # Wczytanie konfiguracji i wyników
         self.config = load_config()
         self.scores_data = load_scores()
         self.player_name = ""
         self.setup_game()
         self.check_first_run()
+
+        # Flagi stanów gry
         self.menu_active = True
         self.options_active = False
         self.scores_active = False
+
+        # Indeksy wybranych opcji w menu
         self.selected_menu_item = 0
         self.selected_option = 0
         self.menu_items = ["Start", "Opcje", "Wyniki", "Wyjdź"]
 
+        # Zmienne związane z wyszukiwaniem wyników
         self.search_mode = "all"
         self.search_term = ""
         self.search_active = False
@@ -32,6 +40,7 @@ class FlappyBirdGame:
         self.init_music()
 
     def setup_game(self):
+        """Inicjalizacja podstawowych elementów gry."""
         pygame.init()
         pygame.mixer.init()
         self.screen = pygame.display.set_mode(
@@ -46,11 +55,13 @@ class FlappyBirdGame:
         except pygame.error:
             self.background = None
 
+        # Inicjalizacja zegara i czcionek
         self.clock = pygame.time.Clock()
         self.font_large = pygame.font.SysFont('Arial', 50, bold=True)
         self.font_medium = pygame.font.SysFont('Arial', 30, bold=True)
         self.font_small = pygame.font.SysFont('Arial', 20)
 
+        # Inicjalizacja ptaka i rur
         self.bird = Bird(
             x=100,
             y=self.config['height'] // 2,
@@ -65,11 +76,13 @@ class FlappyBirdGame:
             speed=self.config['pipe_speed']
         )
 
+        # Inicjalizacja wyników
         self.score = 0
         self.high_score = self.scores_data.get('high_score', 0)
         self.game_active = False
 
     def init_music(self):
+        """Inicjalizacja muzyki w tle."""
         try:
             pygame.mixer.music.load("background_music.mp3")
             pygame.mixer.music.set_volume(0.1)
@@ -80,15 +93,17 @@ class FlappyBirdGame:
             self.music_playing = False
 
     def check_first_run(self):
+        """Sprawdza, czy gra jest uruchamiana po raz pierwszy i prosi o podanie nazwy gracza."""
         if not hasattr(self, 'player_name') or not self.player_name:
             self.show_name_input()
 
     def show_name_input(self):
+        """Wyświetla ekran wprowadzania nazwy gracza."""
         input_active = True
         name = ""
-        font_title = pygame.font.SysFont('Arial', 36, bold=True)  # Mniejsza czcionka dla tytułu
-        font_input = pygame.font.SysFont('Arial', 24)  # Mniejsza czcionka dla wprowadzanego tekstu
-        font_prompt = pygame.font.SysFont('Arial', 18)  # Mniejsza czcionka dla podpowiedzi
+        font_title = pygame.font.SysFont('Arial', 36, bold=True)
+        font_input = pygame.font.SysFont('Arial', 24)
+        font_prompt = pygame.font.SysFont('Arial', 18)
 
         while input_active:
             for event in pygame.event.get():
@@ -104,8 +119,8 @@ class FlappyBirdGame:
                     else:
                         name += event.unicode
 
+            # Rysowanie interfejsu wprowadzania nazwy
             self.screen.fill(self.config['bg_color'])
-            # Tytuł z mniejszą czcionką
             title = font_title.render("Wprowadź swoją nazwę", True, self.white)
             self.screen.blit(title, (self.config['width'] // 2 - title.get_width() // 2, 100))
 
@@ -115,7 +130,7 @@ class FlappyBirdGame:
                              (self.config['width'] // 2 - 150, 180, 300, 40), 2, border_radius=10)
             self.screen.blit(name_text, (self.config['width'] // 2 - name_text.get_width() // 2, 190))
 
-            # Podpowiedź z mniejszą czcionką
+            # Podpowiedź
             prompt = font_prompt.render("Naciśnij Enter aby kontynuować", True, self.white)
             self.screen.blit(prompt, (self.config['width'] // 2 - prompt.get_width() // 2, 250))
 
@@ -123,9 +138,10 @@ class FlappyBirdGame:
             self.clock.tick(self.config['fps'])
 
     def draw_button(self, x, y, width, height, text, is_selected=False, is_hovered=False):
+        """Rysuje przycisk na ekranie."""
         button_color = self.dark_orange if is_selected or is_hovered else self.orange_color
         pygame.draw.rect(self.screen, button_color, (x, y, width, height), border_radius=15)
-        pygame.draw.rect(self.screen, self.black, (x, y, width, height), 2, border_radius=15)  # Obramowanie
+        pygame.draw.rect(self.screen, self.black, (x, y, width, height), 2, border_radius=15)
 
         text_surface = self.font_medium.render(text, True, self.black)
         text_rect = text_surface.get_rect(center=(x + width // 2, y + height // 2))
@@ -133,6 +149,7 @@ class FlappyBirdGame:
         return pygame.Rect(x, y, width, height)
 
     def handle_events(self):
+        """Obsługuje zdarzenia w grze."""
         running = True
         mouse_pos = pygame.mouse.get_pos()
 
@@ -184,50 +201,17 @@ class FlappyBirdGame:
 
                 if self.game_active:
                     self.bird.jump()
-
                 elif self.menu_active and not self.options_active and not self.scores_active:
                     self.check_menu_click(mouse_pos)
-
                 elif self.options_active:
                     self.check_options_click(mouse_pos)
-
                 elif self.scores_active:
-                    # Pobierz recty przycisków z render_high_scores
-                    plot_button_rect, back_button_rect = self.render_high_scores()
-
-                    # Sprawdź kliknięcie w pole wyszukiwania
-                    search_rect = pygame.Rect(self.config['width'] // 2 - 150, 120, 300, 30)
-                    if search_rect.collidepoint(mouse_pos):
-                        self.search_active = True
-                        self.search_term = ""
-
-                    # Sprawdź kliknięcie przycisku "Wszyscy"
-                    all_rect = pygame.Rect(self.config['width'] // 2 - 200, 160, 100, 30)
-                    if all_rect.collidepoint(mouse_pos):
-                        self.search_mode = "all"
-                        self.search_active = False
-
-                    # Sprawdź kliknięcie przycisku "Szukaj"
-                    search_btn_rect = pygame.Rect(self.config['width'] // 2 + 100, 160, 100, 30)
-                    if search_btn_rect.collidepoint(mouse_pos):
-                        self.search_mode = "search"
-                        self.search_active = False
-
-                    # Sprawdź kliknięcie przycisku "Generuj wykres"
-                    if plot_button_rect.collidepoint(mouse_pos):
-                        from utils import plot_scores
-                        plot_scores()
-                        # Odśwież dane wyników
-                        self.scores_data = load_scores()
-                        pygame.time.delay(300)  # Krótkie opóźnienie dla feedbacku
-
-                    # Sprawdź kliknięcie przycisku "Powrót"
-                    if back_button_rect.collidepoint(mouse_pos):
-                        self.scores_active = False
+                    self.handle_scores_click(mouse_pos)
 
         return running
 
     def handle_menu_selection(self):
+        """Obsługuje wybór opcji w menu głównym."""
         if self.selected_menu_item == 0:  # Start
             self.start_game()
         elif self.selected_menu_item == 1:  # Opcje
@@ -240,12 +224,14 @@ class FlappyBirdGame:
             exit()
 
     def handle_options_selection(self):
+        """Obsługuje wybór opcji w menu opcji."""
         if self.selected_option == 4:  # Zmień nazwę
             self.show_name_input()
         elif self.selected_option == 5:  # Powrót
             self.options_active = False
 
     def check_menu_click(self, mouse_pos):
+        """Sprawdza kliknięcie w przyciski menu głównego."""
         button_width = 200
         button_height = 50
         start_y = 200
@@ -263,6 +249,7 @@ class FlappyBirdGame:
                 break
 
     def check_options_click(self, mouse_pos):
+        """Sprawdza kliknięcie w przyciski menu opcji."""
         button_width = 300
         button_height = 40
         start_y = 150
@@ -279,16 +266,52 @@ class FlappyBirdGame:
                 self.handle_options_selection()
                 break
 
+    def handle_scores_click(self, mouse_pos):
+        """Obsługuje kliknięcia w ekranie wyników."""
+        plot_button_rect, back_button_rect = self.render_high_scores()
+
+        # Sprawdź kliknięcie w pole wyszukiwania
+        search_rect = pygame.Rect(self.config['width'] // 2 - 150, 120, 300, 30)
+        if search_rect.collidepoint(mouse_pos):
+            self.search_active = True
+            self.search_term = ""
+
+        # Sprawdź kliknięcie przycisku "Wszyscy"
+        all_rect = pygame.Rect(self.config['width'] // 2 - 200, 160, 100, 30)
+        if all_rect.collidepoint(mouse_pos):
+            self.search_mode = "all"
+            self.search_active = False
+
+        # Sprawdź kliknięcie przycisku "Szukaj"
+        search_btn_rect = pygame.Rect(self.config['width'] // 2 + 100, 160, 100, 30)
+        if search_btn_rect.collidepoint(mouse_pos):
+            self.search_mode = "search"
+            self.search_active = False
+
+        # Sprawdź kliknięcie przycisku "Generuj wykres"
+        if plot_button_rect.collidepoint(mouse_pos):
+            from utils import plot_scores
+            plot_scores()
+            self.scores_data = load_scores()
+            pygame.time.delay(300)
+
+        # Sprawdź kliknięcie przycisku "Powrót"
+        if back_button_rect.collidepoint(mouse_pos):
+            self.scores_active = False
+
     def start_game(self):
+        """Rozpoczyna nową grę."""
         self.menu_active = False
         self.game_active = True
         self.reset_game()
 
     def update(self):
+        """Aktualizuje stan gry."""
         if self.game_active:
             self.bird.update()
             self.pipes.update()
 
+            # Sprawdzenie kolizji
             if self.pipes.check_collision(self.bird.rect) or \
                     self.bird.rect.top <= 0 or \
                     self.bird.rect.bottom >= self.config['height']:
@@ -297,6 +320,7 @@ class FlappyBirdGame:
             self.score = self.pipes.update_score(self.bird.rect.x, self.score)
 
     def render(self):
+        """Renderuje grę na ekranie."""
         # Rysowanie tła
         if self.background:
             self.screen.blit(self.background, (0, 0))
@@ -321,6 +345,7 @@ class FlappyBirdGame:
         pygame.display.update()
 
     def render_menu(self):
+        """Renderuje menu główne."""
         title = self.font_large.render("Flappy Bird", True, self.white)
         self.screen.blit(title, (self.config['width'] // 2 - title.get_width() // 2, 100))
 
@@ -343,20 +368,22 @@ class FlappyBirdGame:
                                        button_width, button_height)
             )
 
-        # Przesunięcie rekordu i nazwy gracza niżej
+        # Wyświetlanie rekordu i nazwy gracza
         high_score = self.font_small.render(f"Rekord: {int(self.high_score)}", True, self.white)
         self.screen.blit(high_score,
-                         (self.config['width'] // 2 - high_score.get_width() // 2, 480))  # Zmienione z 450 na 480
+                         (self.config['width'] // 2 - high_score.get_width() // 2, 480))
 
         player_text = self.font_small.render(f"Gracz: {self.player_name}", True, self.white)
         self.screen.blit(player_text,
-                         (self.config['width'] // 2 - player_text.get_width() // 2, 510))  # Zmienione z 480 na 510
+                         (self.config['width'] // 2 - player_text.get_width() // 2, 510))
 
     def is_button_hovered(self, mouse_pos, x, y, width, height):
+        """Sprawdza, czy kursor myszy znajduje się nad przyciskiem."""
         button_rect = pygame.Rect(x, y, width, height)
         return button_rect.collidepoint(mouse_pos)
 
     def render_options(self):
+        """Renderuje menu opcji."""
         title = self.font_large.render("Opcje", True, self.white)
         self.screen.blit(title, (self.config['width'] // 2 - title.get_width() // 2, 50))
 
@@ -388,6 +415,7 @@ class FlappyBirdGame:
             )
 
     def render_high_scores(self):
+        """Renderuje ekran z najlepszymi wynikami."""
         self.screen.fill(self.config['bg_color'])
         title = self.font_large.render("Najlepsze wyniki", True, self.white)
         self.screen.blit(title, (self.config['width'] // 2 - title.get_width() // 2, 50))
@@ -461,10 +489,10 @@ class FlappyBirdGame:
             "Powrót (ESC)", False, is_hovered_back
         )
 
-        # Zwróć recty przycisków do późniejszej obsługi
         return plot_button_rect, back_button_rect
 
     def game_over(self):
+        """Obsługuje zakończenie gry."""
         if self.score > self.high_score:
             self.high_score = self.score
         save_score(self.player_name, self.score)
@@ -473,11 +501,13 @@ class FlappyBirdGame:
         self.menu_active = True
 
     def reset_game(self):
-        self.bird.reset()  # To powinno teraz działać
+        """Resetuje stan gry do początkowego."""
+        self.bird.reset()
         self.pipes.reset()
         self.score = 0
 
     def run(self):
+        """Główna pętla gry."""
         running = True
         while running:
             running = self.handle_events()
