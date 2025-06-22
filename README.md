@@ -43,6 +43,7 @@ Projekt implementuje grę Flappy Bird z następującymi funkcjonalnościami:
 - Generowanie wykresów wyników
 
 ## Struktura projektu
+```
 FlappyBird/
 ├── main.py            # Główny plik uruchamiający grę
 ├── game.py            # Główna logika gry
@@ -55,6 +56,7 @@ FlappyBird/
 ├── tests.py           # Testy jednostkowe
 ├── performance_tests.py # Testy wydajnościowe
 └── README.md          # Dokumentacja
+```
 
 ## Diagram klas
 ```mermaid
