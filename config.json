@@ -1,0 +1,11 @@
+{
+    "width": 400,
+    "height": 650,
+    "bg_color": [0, 0, 139],
+    "gravity": 0.25,
+    "jump_force": 7,
+    "pipe_width": 60,
+    "pipe_gap": 150,
+    "pipe_speed": 3,
+    "fps": 60
+}
