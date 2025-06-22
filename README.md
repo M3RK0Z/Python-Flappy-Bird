@@ -59,37 +59,47 @@ FlappyBird/
 ##Diagram klas
 ```mermaid
 classDiagram
-    class GameObject{
-        +Rect rect
+    class FlappyBirdGame{
+        +config
+        +scores_data
+        +player_name
+        +setup_game()
+        +handle_events()
         +update()
-        +draw()
+        +render()
+        +run()
     }
     
     class Bird{
-        +float gravity
-        +float jump_force
+        +gravity
+        +jump_force
+        +movement
         +jump()
+        +update()
         +reset()
     }
     
     class Pipes{
-        +int width
-        +int gap
+        +width
+        +gap
+        +speed
         +add_pipe()
+        +update()
         +check_collision()
-        +update_score()
     }
     
-    class FlappyBirdGame{
-        +Config config
-        +setup_game()
-        +start_game()
-        +game_over()
-        +render_menu()
+    class GameObject{
+        +rect
+        +color
+        +image
+        +update()
+        +draw()
     }
     
-    GameObject <|-- Bird
-    GameObject <|-- Pipes
+    FlappyBirdGame --|> Bird
+    FlappyBirdGame --|> Pipes
+    Bird --|> GameObject
+    Pipes --|> GameObject
 ```
 
 ##Przykładowa konfiguracja
