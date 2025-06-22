@@ -57,6 +57,7 @@ FlappyBird/
 └── README.md          # Dokumentacja
 
 ##Diagram klas
+```mermaid
 classDiagram
     class GameObject{
         +Rect rect
@@ -89,6 +90,7 @@ classDiagram
     
     GameObject <|-- Bird
     GameObject <|-- Pipes
+```
 
 ##Przykładowa konfiguracja
 Plik config.json:
