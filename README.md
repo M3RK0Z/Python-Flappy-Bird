@@ -16,8 +16,7 @@ Klasyczna gra Flappy Bird zaimplementowana w Pythonie przy użyciu biblioteki Py
 pip install pygame matplotlib
 ```
 
-##Uruchamianie
-
+## Uruchamianie
 Główny program:
 ```bash
 python main.py
@@ -33,7 +32,7 @@ Testy wydajnościowe:
 python performance_tests.py
 ```
 
-##Opis projektu
+## Opis projektu
 Projekt implementuje grę Flappy Bird z następującymi funkcjonalnościami:
 - Sterowanie ptakiem (spacja/kliknięcie)
 - Generowanie losowych przeszkód (rury)
@@ -43,7 +42,7 @@ Projekt implementuje grę Flappy Bird z następującymi funkcjonalnościami:
 - Wyświetlanie najlepszych wyników
 - Generowanie wykresów wyników
 
-##Struktura projektu
+## Struktura projektu
 FlappyBird/
 ├── main.py            # Główny plik uruchamiający grę
 ├── game.py            # Główna logika gry
@@ -57,7 +56,7 @@ FlappyBird/
 ├── performance_tests.py # Testy wydajnościowe
 └── README.md          # Dokumentacja
 
-##Diagram klas
+## Diagram klas
 ```mermaid
 classDiagram
     class FlappyBirdGame{
@@ -103,8 +102,7 @@ classDiagram
     Pipes --|> GameObject
 ```
 
-##Przykładowa konfiguracja
-
+## Przykładowa konfiguracja
 Plik config.json:
 ```bash
 {
@@ -120,8 +118,7 @@ Plik config.json:
 }
 ```
 
-##Funkcje specjalne
-
+## Funkcje specjalne
 - Możliwość zmiany nazwy gracza
 - Generowanie wykresów z najlepszymi wynikami
 - Filtrowanie wyników po nazwie gracza
