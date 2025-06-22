@@ -17,6 +17,7 @@ pip install pygame matplotlib
 ```
 
 ##Uruchamianie
+
 Główny program:
 ```bash
 python main.py
@@ -103,6 +104,7 @@ classDiagram
 ```
 
 ##Przykładowa konfiguracja
+
 Plik config.json:
 ```bash
 {
@@ -119,6 +121,7 @@ Plik config.json:
 ```
 
 ##Funkcje specjalne
+
 - Możliwość zmiany nazwy gracza
 - Generowanie wykresów z najlepszymi wynikami
 - Filtrowanie wyników po nazwie gracza
