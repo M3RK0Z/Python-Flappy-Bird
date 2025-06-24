@@ -475,7 +475,7 @@ class FlappyBirdGame:
         self.draw_button(
             plot_button_rect.x, plot_button_rect.y,
             plot_button_rect.width, plot_button_rect.height,
-            "Generuj wykres", False, is_hovered
+            "Pokaż wykres", False, is_hovered  # Zmieniona nazwa przycisku
         )
 
         # Przycisk powrotu

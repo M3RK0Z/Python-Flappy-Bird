@@ -98,20 +98,29 @@ def get_average_score(filename='scores.json'):
     except (FileNotFoundError, json.JSONDecodeError):
         return 0
 
+
 def plot_scores(filename='scores.json'):
-    """Generuje wykres najlepszych wyników i zapisuje go do pliku PNG."""
+    """Generuje wykres najlepszych wyników, wyświetla go i zapisuje do pliku."""
     try:
         scores = load_scores(filename)
         if not scores["players"]:
             print("Brak danych do wygenerowania wykresu.")
             return
 
-        # Przygotowanie danych - top 10 graczy
-        top_players = sorted(scores["players"], key=lambda x: x["score"], reverse=True)[:10]
-        names = [player["name"] for player in top_players]
-        scores = [player["score"] for player in top_players]
+        # Przygotowanie danych - tylko najlepszy wynik każdego gracza
+        players = {}
+        for player in scores["players"]:
+            name = player["name"]
+            score = player["score"]
+            if name not in players or score > players[name]:
+                players[name] = score
 
-        # Konfiguracja wykresu
+        # Sortowanie i wybór top 10
+        sorted_players = sorted(players.items(), key=lambda x: x[1], reverse=True)[:10]
+        names = [player[0] for player in sorted_players]
+        scores = [player[1] for player in sorted_players]
+
+        # Stwórz wykres
         plt.figure(figsize=(10, 6))
         bars = plt.bar(names, scores, color='skyblue')
         plt.title("Top 10 Graczy - Flappy Bird", fontweight='bold')
@@ -119,7 +128,7 @@ def plot_scores(filename='scores.json'):
         plt.ylabel("Wynik", fontstyle='italic')
         plt.xticks(rotation=45, ha='right')
 
-        # Dodanie wartości na słupkach
+        # Dodaj wartości na słupkach
         for bar in bars:
             height = bar.get_height()
             plt.text(bar.get_x() + bar.get_width() / 2., height,
@@ -127,9 +136,13 @@ def plot_scores(filename='scores.json'):
                      ha='center', va='bottom')
 
         plt.tight_layout()
+
+        # Zapisz wykres do pliku
         plt.savefig("top_scores.png", dpi=100)
-        plt.close()
         print("📊 Wykres zapisano jako 'top_scores.png'.")
+
+        # Wyświetl wykres
+        plt.show()
 
     except Exception as e:
         print(f"❌ Błąd podczas generowania wykresu: {e}")
