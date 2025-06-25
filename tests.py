@@ -124,5 +124,15 @@ class TestFlappyBird(unittest.TestCase):
         self.assertFalse(self.game.game_active)
         self.assertTrue(self.game.menu_active)
 
+    def test_min_score(self):
+        min_score = 0
+        save_score(self.test_name, min_score)
+        scores = load_scores()
+        self.assertTrue(any(p['score'] == min_score for p in scores['players']))
+
+    def test_empty_player_name(self):
+        with self.assertRaises(ValueError):
+            save_score("", 10)
+
 if __name__ == '__main__':
     unittest.main()
