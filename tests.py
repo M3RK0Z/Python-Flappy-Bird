@@ -114,5 +114,15 @@ class TestFlappyBird(unittest.TestCase):
         self.assertFalse(self.game.game_active)  # Czy gra została zatrzymana
         self.assertTrue(self.game.menu_active)    # Czy menu zostało aktywowane
 
+    def test_game_initialization_integration(self):
+        """Testuje poprawne inicjalizowanie wszystkich komponentów gry"""
+        self.assertIsInstance(self.game.bird, Bird)
+        self.assertIsInstance(self.game.pipes, Pipes)
+        self.assertEqual(self.game.player_name, "TEST_PLAYER")
+        self.assertEqual(self.game.config['width'], 400)
+        self.assertEqual(self.game.config['height'], 650)
+        self.assertFalse(self.game.game_active)
+        self.assertTrue(self.game.menu_active)
+
 if __name__ == '__main__':
     unittest.main()
