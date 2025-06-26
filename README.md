@@ -45,17 +45,20 @@ Projekt implementuje grę Flappy Bird z następującymi funkcjonalnościami:
 ## Struktura projektu
 ```
 FlappyBird/
-├── main.py            # Główny plik uruchamiający grę
-├── game.py            # Główna logika gry
-├── bird.py            # Implementacja ptaka
-├── pipes.py           # Implementacja rur
-├── game_object.py     # Bazowa klasa obiektów gry
-├── utils.py           # Narzędzia pomocnicze
-├── config.json        # Konfiguracja gry
-├── scores.json        # Zapisane wyniki
-├── tests.py           # Testy jednostkowe
-├── performance_tests.py # Testy wydajnościowe
-└── README.md          # Dokumentacja
+├── main.py               # Główny plik uruchamiający grę
+├── game.py               # Główna logika gry
+├── bird.py               # Implementacja ptaka
+├── pipes.py              # Implementacja rur
+├── game_object.py        # Bazowa klasa obiektów gry
+├── utils.py              # Narzędzia pomocnicze
+├── config.json           # Konfiguracja gry
+├── scores.json           # Zapisane wyniki
+├── tests.py              # Testy jednostkowe
+├── performance_test.py   # Testy wydajnościowe
+├── testy_jakosci.py      # Testy jakosci
+├── test_funkcjonalny.py  # Testy funkcjonalności
+├── testy_pamieci.py      # Testy pamieci
+└── README.md             # Dokumentacja
 ```
 
 ## Diagram klas
