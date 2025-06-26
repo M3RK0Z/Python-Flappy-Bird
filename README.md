@@ -16,6 +16,11 @@ Klasyczna gra Flappy Bird zaimplementowana w Pythonie przy użyciu biblioteki Py
 pip install pygame matplotlib
 ```
 
+## Instalacja bibliotek do testów
+```bash
+pip install memory_profiler Flake8
+```
+
 ## Uruchamianie
 Główny program:
 ```bash
